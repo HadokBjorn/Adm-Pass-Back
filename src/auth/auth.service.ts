@@ -33,6 +33,15 @@ export class AuthService {
     return this.createToken(user);
   }
 
+  async checkToken(token: string) {
+    try {
+      const data = await this.jwtService.verify(token);
+      return data;
+    } catch (error) {
+      throw new UnauthorizedException('Token is not valid');
+    }
+  }
+
   private async createToken(user: User) {
     const { id, email } = user;
 
