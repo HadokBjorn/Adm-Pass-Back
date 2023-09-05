@@ -30,7 +30,7 @@ export class AuthService {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) throw new UnauthorizedException(`Email or password not valid.`);
 
-    return this.createToken(user);
+    return await this.createToken(user);
   }
 
   async checkToken(token: string) {
