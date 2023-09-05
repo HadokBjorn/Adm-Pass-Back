@@ -19,10 +19,10 @@ export class AuthGuard implements CanActivate {
     const { authorization } = request.headers;
 
     try {
-      const data = this.authService.checkToken(
+      const data = await this.authService.checkToken(
         (authorization ?? '').split(' ')[1],
       );
-      const user = await this.userService.findOne(parseInt(data.sub));
+      const user = await this.userService.getUserById(parseInt(data.sub));
       request.user = user;
       return true;
     } catch (error) {
