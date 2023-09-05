@@ -24,10 +24,12 @@ model Credential {
   id        Int @id @default(autoincrement())
   user      User @relation(fields: [userId], references: [id])
   userId    Int
-  title     String @unique
+  title     String
   url       String
   username  String
   password  String
+
+  @@unique([title, userId])
 
   @@map("credentials")
 }

@@ -2,18 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { UpdateCredentialDto } from './dto/update-credential.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Credential } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class CredentialsRepository {
-  private SALT = 10;
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createCredentialDto: Omit<Credential, 'id'>) {
     return await this.prisma.credential.create({
-      data: {
-        ...createCredentialDto,
-        password: bcrypt.hashSync(createCredentialDto.password, this.SALT),
+      data: createCredentialDto,
+      select: {
+        id: true,
+        userId: true,
+        title: true,
+        url: true,
+        username: true,
       },
     });
   }
@@ -29,9 +31,11 @@ export class CredentialsRepository {
       where: { id },
     });
   }
-  findByTitle(title: string) {
+  findByTitle(title: string, userId: number) {
     return this.prisma.credential.findUnique({
-      where: { title },
+      where: {
+        title_userId: { title, userId },
+      },
     });
   }
 

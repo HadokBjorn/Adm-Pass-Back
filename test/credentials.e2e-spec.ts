@@ -210,19 +210,89 @@ describe('Credentials Controller (e2e)', () => {
   });
 
   it('/credentials/:id (GET) => Should return a status 404 NOT FOUND when user has no credentials', async () => {
-    const userOne = await new UserFactory(prisma).createRandomUser();
+    const user = await new UserFactory(prisma).createRandomUser();
     const { token } = await new UserFactory(prisma).createToken(
-      userOne,
+      user,
       jwtService,
     );
 
     const { id } = await new CredentialsFactory(prisma).createRandomCredential(
-      userOne.id,
+      user.id,
     );
 
     await request(app.getHttpServer())
       .get(`/credentials/${id + 1}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(HttpStatus.NOT_FOUND);
+  });
+
+  it('/credentials/:id (GET) => Should return a status 200 OK and credential with password decrypted', async () => {
+    const user = await new UserFactory(prisma).createRandomUser();
+    const { token } = await new UserFactory(prisma).createToken(
+      user,
+      jwtService,
+    );
+
+    const { title, url, username, password } = new CredentialsFactory(
+      prisma,
+    ).setRandomBuild();
+
+    const { id } = await new CredentialsFactory(prisma)
+      .setTitle(title)
+      .setUrl(url)
+      .setUsername(username)
+      .setPassword(password)
+      .createCredential(user.id);
+
+    const { body } = await request(app.getHttpServer())
+      .get(`/credentials/${id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(HttpStatus.OK);
+
+    expect(body).toEqual({
+      id: expect.any(Number),
+      userId: user.id,
+      title: title,
+      url: url,
+      username: username,
+      password: password,
+    });
+  });
+
+  it('/credentials (GET) => Should return a status 200 OK and all user credentials with password decrypted', async () => {
+    const user = await new UserFactory(prisma).createRandomUser();
+    const { token } = await new UserFactory(prisma).createToken(
+      user,
+      jwtService,
+    );
+
+    const { title, url, username, password } = new CredentialsFactory(
+      prisma,
+    ).setRandomBuild();
+
+    await new CredentialsFactory(prisma).createRandomCredential(user.id);
+    await new CredentialsFactory(prisma).createRandomCredential(user.id);
+    await new CredentialsFactory(prisma).createRandomCredential(user.id);
+
+    await new CredentialsFactory(prisma)
+      .setTitle(title)
+      .setUrl(url)
+      .setUsername(username)
+      .setPassword(password)
+      .createCredential(user.id);
+
+    const { body } = await request(app.getHttpServer())
+      .get(`/credentials`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(HttpStatus.OK);
+
+    expect(body).toContainEqual({
+      id: expect.any(Number),
+      userId: user.id,
+      title: title,
+      url: url,
+      username: username,
+      password: password,
+    });
   });
 });

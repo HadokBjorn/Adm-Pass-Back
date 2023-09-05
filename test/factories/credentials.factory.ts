@@ -1,8 +1,13 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { faker } from '@faker-js/faker';
-import * as bcrypt from 'bcrypt';
+import Cryptr from 'cryptr';
 export class CredentialsFactory {
   private SALT = 10;
+  private Cryptr = require('cryptr');
+  private cryptr: Cryptr = new this.Cryptr(process.env.CRYPTR_SECRET, {
+    saltLength: this.SALT,
+  });
+
   private title: string;
   private url: string;
   private username: string;
@@ -80,7 +85,7 @@ export class CredentialsFactory {
       data: {
         ...credential,
         userId: userId,
-        password: bcrypt.hashSync(credential.password, this.SALT),
+        password: this.cryptr.encrypt(credential.password),
       },
     });
   }
@@ -91,7 +96,7 @@ export class CredentialsFactory {
       data: {
         ...credential,
         userId: userId,
-        password: bcrypt.hashSync(credential.password, this.SALT),
+        password: this.cryptr.encrypt(credential.password),
       },
     });
   }
