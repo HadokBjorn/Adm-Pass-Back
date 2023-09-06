@@ -30,4 +30,10 @@ export class UsersRepository {
       select: { id: true, name: true, email: true },
     });
   }
+
+  remove(id: number) {
+    return this.prisma.user.delete({
+      where: { id },
+    });
+  }
 }

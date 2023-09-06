@@ -58,4 +58,8 @@ export class NotesService {
     }
     return await this.repository.remove(id);
   }
+
+  async deleteByUserId(userId: number) {
+    return await this.repository.deleteByUserId(userId);
+  }
 }

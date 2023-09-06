@@ -45,4 +45,10 @@ export class CardsRepository {
       where: { id },
     });
   }
+
+  deleteByUserId(userId: number) {
+    return this.prisma.card.deleteMany({
+      where: { userId },
+    });
+  }
 }
