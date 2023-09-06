@@ -54,7 +54,7 @@ model Card {
   userId      Int
   title     String
   name        String
-  number      Int
+  number      String
   cvc         String
   expiration  DateTime
   password    String
