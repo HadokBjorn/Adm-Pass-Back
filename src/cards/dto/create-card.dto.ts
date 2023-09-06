@@ -1,10 +1,4 @@
-import {
-  IsBoolean,
-  IsDateString,
-  IsNotEmpty,
-  IsString,
-  IsStrongPassword,
-} from 'class-validator';
+import { IsBoolean, IsDateString, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateCardDto {
   @IsNotEmpty()
@@ -16,7 +10,8 @@ export class CreateCardDto {
   name: string;
 
   @IsNotEmpty()
-  number: number;
+  @IsString()
+  number: string;
 
   @IsNotEmpty()
   @IsString()
@@ -27,7 +22,7 @@ export class CreateCardDto {
   expiration: string;
 
   @IsNotEmpty()
-  @IsStrongPassword()
+  @IsString()
   password: string;
 
   @IsNotEmpty()
