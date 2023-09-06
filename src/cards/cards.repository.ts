@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { Card } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class CardsRepository {
