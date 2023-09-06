@@ -204,17 +204,30 @@ describe('Notes Controller (e2e)', () => {
       jwtService,
     );
 
-    const { title, text } = new NotesFactory(prisma).setRandomBuild();
-
-    const { id } = await new NotesFactory(prisma)
-      .setTitle(title)
-      .setText(text)
-      .createNote(user.id);
+    const { id } = await new NotesFactory(prisma).createRandomNote(user.id);
 
     await request(app.getHttpServer())
       .delete(`/notes/${id + 1}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(HttpStatus.NOT_FOUND);
+  });
+
+  it('/notes/:id (DELETE) => Should return a status 200 Ok when delete a note', async () => {
+    const user = await new UserFactory(prisma).createRandomUser();
+    const { token } = await new UserFactory(prisma).createToken(
+      user,
+      jwtService,
+    );
+
+    const { id } = await new NotesFactory(prisma).createRandomNote(user.id);
+
+    await request(app.getHttpServer())
+      .delete(`/notes/${id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(HttpStatus.OK);
+
+    const notes = await prisma.note.findMany();
+    expect(notes).toHaveLength(0);
   });
 
   it('/notes/:id (DELETE) => Should return a status 403 FORBIDDEN when userId is from another user', async () => {
@@ -225,12 +238,7 @@ describe('Notes Controller (e2e)', () => {
       jwtService,
     );
 
-    const { title, text } = new NotesFactory(prisma).setRandomBuild();
-
-    const { id } = await new NotesFactory(prisma)
-      .setTitle(title)
-      .setText(text)
-      .createNote(userTwo.id);
+    const { id } = await new NotesFactory(prisma).createRandomNote(userTwo.id);
 
     await request(app.getHttpServer())
       .delete(`/notes/${id}`)
@@ -238,7 +246,7 @@ describe('Notes Controller (e2e)', () => {
       .expect(HttpStatus.FORBIDDEN);
   });
 
-  it('/notes (GET) => Should return a status 200 OK and all user credentials with password decrypted', async () => {
+  it('/notes (GET) => Should return a status 200 OK and all notes', async () => {
     const user = await new UserFactory(prisma).createRandomUser();
     const { token } = await new UserFactory(prisma).createToken(
       user,
