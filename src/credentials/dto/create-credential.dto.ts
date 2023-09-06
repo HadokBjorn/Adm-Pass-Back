@@ -11,6 +11,6 @@ export class CreateCredentialDto {
   @IsString()
   username: string;
   @IsNotEmpty()
-  @IsStrongPassword()
+  @IsString()
   password: string;
 }
