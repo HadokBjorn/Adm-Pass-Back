@@ -56,7 +56,11 @@ export class CardsService {
     if (card.userId !== userId) {
       throw new ForbiddenException('this Card does not belong to you');
     }
-    return card;
+    return {
+      ...card,
+      cvc: this.cryptr.decrypt(card.cvc),
+      password: this.cryptr.decrypt(card.password),
+    };
   }
 
   async update(id: number, updateCardDto: UpdateCardDto, userId: number) {
