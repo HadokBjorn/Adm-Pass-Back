@@ -295,4 +295,59 @@ describe('Credentials Controller (e2e)', () => {
       password: password,
     });
   });
+
+  it('/credentials/:id (DELETE) => Should return a status 404 NOT FOUND when credential not exist', async () => {
+    const user = await new UserFactory(prisma).createRandomUser();
+    const { token } = await new UserFactory(prisma).createToken(
+      user,
+      jwtService,
+    );
+
+    const { id } = await new CredentialsFactory(prisma).createRandomCredential(
+      user.id,
+    );
+
+    await request(app.getHttpServer())
+      .delete(`/credentials/${id + 1}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(HttpStatus.NOT_FOUND);
+  });
+
+  it('/credentials/:id (DELETE) => Should return a status 200 Ok when delete a credential', async () => {
+    const user = await new UserFactory(prisma).createRandomUser();
+    const { token } = await new UserFactory(prisma).createToken(
+      user,
+      jwtService,
+    );
+
+    const { id } = await new CredentialsFactory(prisma).createRandomCredential(
+      user.id,
+    );
+
+    await request(app.getHttpServer())
+      .delete(`/credentials/${id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(HttpStatus.OK);
+
+    const credentials = await prisma.credential.findMany();
+    expect(credentials).toHaveLength(0);
+  });
+
+  it('/credentials/:id (DELETE) => Should return a status 403 FORBIDDEN when userId is from another user', async () => {
+    const userOne = await new UserFactory(prisma).createRandomUser();
+    const userTwo = await new UserFactory(prisma).createRandomUser();
+    const { token } = await new UserFactory(prisma).createToken(
+      userOne,
+      jwtService,
+    );
+
+    const { id } = await new CredentialsFactory(prisma).createRandomCredential(
+      userTwo.id,
+    );
+
+    await request(app.getHttpServer())
+      .delete(`/credentials/${id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(HttpStatus.FORBIDDEN);
+  });
 });
