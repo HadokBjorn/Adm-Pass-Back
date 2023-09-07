@@ -45,6 +45,14 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Documentation
+
+```bash
+# After running the app, go to the following route
+
+https://localhost:3000/api
+```
+
 ## Test
 
 ```bash
