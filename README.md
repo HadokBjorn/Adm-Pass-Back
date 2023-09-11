@@ -51,6 +51,11 @@ $ npm run start:prod
 # After running the app, go to the following route
 
 https://localhost:3000/api
+
+or
+#Go to:
+
+https://adm-pass.onrender.com/api
 ```
 
 ## Test
